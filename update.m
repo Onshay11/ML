@@ -1,4 +1,4 @@
-function [ theta ] = update( norm, price, rate, iter, theta )
+function [ theta ] = update( norm,price, rate, iter, theta )
 %UNTITLED5 Summary of this function goes here
 %   Detailed explanation goes here
     for i =  1:iter

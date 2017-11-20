@@ -1,2 +1,4 @@
 % sklearn taken from online
 % DataRead.m is the main script. 
+
+% Must Import Data by opening LabData in Matlab and import the columns S - AH replacing the unimportable values with 0

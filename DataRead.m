@@ -6,6 +6,11 @@ messagerw = 1;
 bit = [];
 TotMess = [];
 n = 2;
+a =0;
+b = 0;
+c = 0;
+d = 0;
+e = 0;
 
 while n < TrainLength
     mess = LabData(n:n+7,:);
@@ -22,41 +27,32 @@ bit = bit';
 %[dest_norm, dest_med, dest_stndev] = [];
 
 [func_norm ,func_med, func_stndev] = normalize_col(TotMess);
-n = 2;
 
+X_train = func_norm(1:TrainLength,:);
+X_test = func_norm(TrainLength+1 : end ,:);
+y_train = bit(1:TrainLength,:);
+y_test = bit(TrainLength+1 : end ,:);
 
-norm = [func_norm];%,dest_norm];
+for elm = y_test'
+    if elm == 98
+        a = a+1;
+    elseif elm == 99
+        b = b+1;
+    elseif elm == 101
+        c = c+1;
+    elseif elm == 102
+        d = d+1;
+    elseif elm == 103
+        e = e+1;
+    end
+end
 
-rate = .001;
-iter = 500;
-theta = zeros(128, 1);
-theta  = update(norm(1:BitLength,:),bit(1:BitLength,:), rate, iter, theta);
+Mdl = fitcnb(X_train,y_train);
 
-test_func = normalize_col(norm(BitLength+1 : end ,:));
+rng(1);
+CVMdl1 = fitcnb(X_train,y_train,'CrossVal','on');
+t = templateNaiveBayes();
+CVMdl2 = fitcecoc(X_test,y_test,'CrossVal','on','Learners',t);
 
-tbit = abs(test_func*theta)
-
-% X_train = norm(1:BitLength,:);
-% X_test = norm(BitLength+1 : end ,:);
-% y_train = bit(1:BitLength,:);
-% y_test = bit(BitLength+1 : end ,:);
-% 
-% f1 = figure; hold all
-% plot(X_train(y_train==0,1),X_train(y_train==0,2),'o')
-% plot(X_train(y_train==1,1),X_train(y_train==1,2),'o')
-% title('Training data')
-% 
-% clf = LogisticRegression;
-% 
-% clf.fit(X_train,y_train);
-% 
-% proba = clf.predict_proba(X_test);
-% 
-% [perfx,perfy,T,AUC] = perfcurve(y_test,proba,true);
-% 
-% fprintf('AUC = %.4f\n',AUC)
-% 
-% f2 = figure; plot(perfx,perfy)
-% xlabel('False positive rate')
-% ylabel('True positive rate')
-% title('ROC for Classification by Logistic Regression')
+classErr1 = kfoldLoss(CVMdl1,'LossFun','ClassifErr')
+classErr2 = kfoldLoss(CVMdl2,'LossFun','ClassifErr')
